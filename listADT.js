@@ -1,0 +1,217 @@
+/**
+ * listSize (property) Number of elements in list 
+ * pos (property) Current position in list
+ * length (property) Returns the number of elements in list
+ * clear (function) Clears all elements from list
+ * toString (function) Returns string representation of list 
+ * getElement (function) Returns element at current position 
+ * insert (function) Inserts new element after existing element 
+ * append (function) Adds new element to end of list 
+ * remove (function) Removes element from list
+ * front (function) Sets current position to first element of list
+ * end (function) Sets current position to last element of list
+ * prev (function) Moves current position back one element
+ * next (function) Moves current position forward one element
+ * currPos (function) Returns the current position in list
+ * moveTo (function) Moves the current position to specified position
+ */
+
+function List(){
+    this.listSize = 0;
+    this.pos = 0;
+    this.dataStore = []; // initializes an empty array to store list elements   
+    this.clear = clear;
+    this.find = find;
+    this.toString = toString; 
+    this.insert = insert;   
+    this.append = append;   
+    this.remove = remove;   
+    this.front = front;   
+    this.end = end;   
+    this.prev = prev;   
+    this.next = next;  
+    this.length = length;   
+    this.currPos = currPos;   
+    this.moveTo = moveTo;   
+    this.getElement = getElement;   
+    this.length = length;   
+    this.contains = contains;
+}
+
+function append(element){
+    this.dataStore[this.listSize++]=element;
+}
+function find(element){
+    for(var i=0; i < this.dataStore.length; ++i){
+        if(this.dataStore[i]==element)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+function remove(element){
+    var foundAt = this.find(element);
+    if(foundAt>-1){
+        this.dataStore.splice(foundAt,1);
+        --this.listSize;
+        return true;
+    }
+    return false;
+}
+function length(){
+    return this.listSize;
+}
+function toString(){
+    return this.dataStore;
+}
+function clear(){
+    delete this.dataStore;
+    this.dataStore = [];
+    this.listSize = this.pos = 0; 
+}
+function insert(element, after){
+    var insertPos = this.find(after);
+    if(insertPos>-1){
+        this.dataStore.splice(insertPos+1,0,element);
+        ++this.listSize;
+        return true;
+    }
+    return false;
+}
+function front(){
+    this.pos = 0;
+}
+function end(){
+    this.pos = this.listSize-1;
+}
+function prev(){
+    if(this.pos > 0){
+        --this.pos;
+    }
+}
+function next(){
+    if(this.pos < this.listSize-1){
+        ++this.pos;
+    }
+}
+
+function currPos(){
+    return this.pos;
+}
+
+function moveTo(position){
+    this.pos = position;
+}
+
+function getElement(){
+    return this.dataStore[this.pos];
+}
+
+function contains(element){
+ for (var i = 0; i < this.dataStore.length; ++i) {
+    if (this.dataStore[i] == element) {
+        return true;
+        }
+    }   return false;
+}
+
+/*test code*/
+var names = new List(); 
+/*names.append("Cynthia");
+names.append("Raymond");
+names.append("Barbara"); 
+console.log(names.toString());
+names.remove("Raymond"); 
+console.log(names.toString()); 
+names.insert("Raymond1","Barbara"); 
+names.insert("Raymond2","Barbara");
+console.log(names.toString()); 
+names.clear();
+console.log(names.toString()); 
+console.log(names.contains("Raymond2"));*
+names.append("Clayton"); 
+names.append("Raymond");
+names.append("Cynthia"); 
+names.append("Jennifer"); 
+names.append("Bryan"); 
+names.append("Danny");
+//move to the front of the list.
+names.front();
+console.log(names.getElement()); 
+names.next(); 
+console.log(names.getElement());
+names.next(); 
+names.next();
+names.prev();
+console.log(names.getElement());  */
+/*names.append("Clayton"); 
+names.append("Raymond");
+names.append("Cynthia"); 
+names.append("Jennifer"); 
+names.append("Bryan"); 
+names.append("Danny");
+for(names.front(); names.currPos() < names.length(); names.next()) { 
+    console.log(names.getElement());
+    if(names.currPos() === names.length()-1){return;} 
+    }
+module.exports = {
+List:List
+};end of test code*/
+
+/****START OF MOVIE APP****/
+var fs = require('fs');
+var movies;
+var movieList = new List();
+var customers = new List(); 
+
+function Customer(name,movie){
+    this.name = name;   
+    this.movie = movie;
+}
+
+function displayList(list){
+    for (list.front(); list.currPos() < list.length(); list.next()) 
+    {
+        if (list.getElement() instanceof Customer) {
+              console.log(list.getElement()["name"] +", "+list.getElement()["movie"]);
+        }
+        else{
+            console.log(list.getElement());
+        }
+        if(list.currPos() === list.length()-1){return;}   
+    }
+}
+function checkOut(name, movie, filmList, customerList) {
+    if(movieList.contains(movie)){
+        var customer = new Customer(name,movie);
+            customerList.append(customer);
+            filmList.remove(movie);
+        }else{
+     console.log(movie + " is not available!");  
+    }
+}
+
+try {  
+    movies = fs.readFileSync('films.txt', 'utf8').split("\r\n"); //split the array based on the carriage return.
+    for (var i = 0; i < movies.length; ++i)
+    {
+        movies[i] = movies[i].trim(); // trim white space from end.
+        console.log(movies[i].substr(movies[i].search('.')+1,movies[i].length));
+    }
+    //console.log(movies);
+    for (var i = 0; i < movies.length; ++i){
+       movieList.append(movies[i]);
+    } 
+    displayList(movieList);
+    console.log("Available movies: \n");
+    console.log(movieList);
+    checkOut("Jane Doe", "The Godfather", movieList, customers);
+    console.log("\nCustomer Rentals: \n"); 
+    displayList(customers); 
+    return;
+} catch(e) {
+    console.log('Error:', e.stack);
+}
+
+ 
